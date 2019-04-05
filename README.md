@@ -29,9 +29,16 @@ Implement an User Authentication System in order to access the jokes from the Jo
 Demonstrate your understanding of this week's concepts by answering the following free-form questions. Edit this document to include your answers after each question. Make sure to leave a blank line above and below your answer so it is clear and easy to read by your project manager.
 
 1. What is the purpose of using _sessions_?
+Sessions are used to have data persistance after a user leaves a website. Normally, when we change pages or leave a website, the server forgets everything about the user. So, for the sake of user experience, sessions are used to tell the server there's no need to prompt the user for his password once again. The server adds a datapoint that says there's a session on a specific device by a specific account. Hence, you can have multiple sessions when logged in across multiple devices with the same account (if the database allows that.) Some sites will limit the amount of sessions to one per account or will keep track of how many you have running in tandem. When dealing with SaaS products, this is how they usually keep track of the number of accounts connected to a single payment plan.
+
 1. What does bcrypt do to help us store passwords in a secure manner.
+Bcrypt is a module that takes care of the hashing for us. In essence, Bcrypt is an all-in-one solution. For the moment, Bcrypt's hashing function hasn't been broken yet. What's more, Bcrypt allows for both manual and automatic salting, as well as doing multiple rounds of hashing. Often, a normal Bcrypt hash will go through between 1000 and 8000 rounds of hashing to further obfuscate the hash.
+
 1. What does bcrypt do to slow down attackers?
+As per the above, Bcrypt makes it more difficult to reverse engineer the hash by doing multiple rounds of hashing, to the order of many thousands. This adds another level of security. Malicious actors won't know _how many times_ the password has been hashed, on top of not knowing the hashing function itself. Therefore, when trying to brute-force it, one would have to both try tens of thousands of possible passwords, but also run every single one of those through tens of thousands of hasing cycles just to go through all possible permutations. 
+
 1. What are the three parts of the JSON Web Token?
+The header, the payload, and the signature. The header contains key-value pairs informing the server about the used algorithm and token-type (i.e. JWT). The payload contains all the data we'd like to store in the token. This can be a JSON object with identifiers (like user_id) and data regarding user-behaviour or other data you'd like to persist. Finally, the signature is made by taking the header and payload and encoding them in base64 and then signing/adding a secret at the end. With the proper secret, this can then be reverse engineered once the token comes back.
 
 ## Project Set Up
 
@@ -46,11 +53,11 @@ Follow these steps to set up and work on your project:
 
 Follow these steps for completing your project:
 
-- [ ] `cd` into the root of the project and run `yarn` to install dependencies.
-- [ ] Once you have your `node_modules` go ahead and run `yarn server` or `npm run server` to start your node server.
-- [ ] Submit a Pull-Request to merge <firstName-lastName> Branch into master (student's  Repo).
-- [ ] Add your Project Manager as a Reviewer on the Pull-request
-- [ ] PM then will count the HW as done by  merging the branch back into master.
+- [x] `cd` into the root of the project and run `yarn` to install dependencies.
+- [x] Once you have your `node_modules` go ahead and run `yarn server` or `npm run server` to start your node server.
+- [x] Submit a Pull-Request to merge <firstName-lastName> Branch into master (student's  Repo).
+- [x] Add your Project Manager as a Reviewer on the Pull-request
+- [x] PM then will count the HW as done by  merging the branch back into master.
 
 Helpful Tip on Testing this Project:
 
