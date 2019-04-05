@@ -1,6 +1,12 @@
 const axios = require('axios');
-
+const db = require('./../database/dbConfig')
 const { authenticate } = require('../auth/authenticate');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const jwtKey =
+  process.env.JWT_SECRET ||
+  'add a .env file to root of project with the JWT_SECRET variable';
+
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -9,24 +15,67 @@ module.exports = server => {
 };
 
 function register(req, res) {
-  // implement user registration
+  let user = req.body;
+  const hash = bcrypt.hashSync(user.password, 10)
+  user.password = hash;
+  add(user)
+    .then(saved => {
+      res.status(201).json(saved)
+    })
+    .catch(error => {
+      res.status(500).json(error)
+    })
 }
 
+
 function login(req, res) {
-  // implement user login
+  let { username, password } = req.body;
+  findBy({ username })
+    .then(user => {
+      console.log('made it')
+      if (user && bcrypt.compareSync(password, user.password)) {
+        
+        const payload = {
+          subject: user.id,
+          username: user.username,
+        }
+        const options = {
+          expiresIn: '1d'
+        }
+        const token = jwt.sign(payload, jwtKey, options)
+          res.status(200).json({
+          message: `Welcome ${user.username}!, have a token...`,
+          token,
+        });
+      } else {
+        res.status(401).json({ message: 'You shall not pass!' });
+      }
+    })
+    .catch(error => {
+      res.status(500).json(error)
+    })
 }
 
 function getJokes(req, res) {
   const requestOptions = {
     headers: { accept: 'application/json' },
   };
-
+  
   axios
-    .get('https://icanhazdadjoke.com/search', requestOptions)
+  .get('https://icanhazdadjoke.com/search', requestOptions)
     .then(response => {
       res.status(200).json(response.data.results);
     })
     .catch(err => {
       res.status(500).json({ message: 'Error Fetching Jokes', error: err });
     });
+}
+
+async function add(user) {
+  const [id] = await db('users').insert(user)
+  return db('users').where({id}).first()
+}
+
+function findBy(filter) {
+  return db('users').where(filter).first()
 }
